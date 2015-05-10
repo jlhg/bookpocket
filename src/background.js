@@ -141,7 +141,7 @@ chrome.webNavigation.onCommitted.addListener(function(details) {
     var found = false;
     var key;
 
-    api.getItemsByDomain(uri.domain(), function(item) {
+    api.getItemsByDomain(uri.host(), function(item) {
       if (item.status !== 2) {
         for (key in item.list) {
           if (item.list[key].given_url === details.url) {
