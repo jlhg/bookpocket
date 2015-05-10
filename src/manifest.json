@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "LetPocket",
   "short_name": "LetPocket",
-  "description": "Save pages to Pocket in bookmarket way",
+  "description": "Save the page to Pocket as a bookmark",
   "version": "0.1",
   "author": "Jian-Long Huang",
   "minimum_chrome_version": "38",
@@ -17,13 +17,14 @@
   },
   "page_action": {
     "default_icon": {
-      "19": "assets/icon_19.png",
-      "38": "assets/icon_38.png"
+      "19": "assets/icon_grey_19.png",
+      "38": "assets/icon_grey_38.png"
     },
-    "default_title": "LetPocket",
-    "default_popup": "popup.html"
+    "default_title": "LetPocket"
   },
   "permissions": [
-    "webNavigation"
+    "webNavigation",
+    "identity",
+    "https://getpocket.com/"
   ]
 }
