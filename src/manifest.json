@@ -11,6 +11,7 @@
   },
   "background": {
     "scripts": [
+      "vendor/URI.js",
       "background.js"
     ],
     "persistent": false

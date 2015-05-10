@@ -89,7 +89,7 @@ var PocketAPI = function() {
     });
   };
 
-  this.getItem = function(search, callback) {
+  this.getItemsByDomain = function(domain, callback) {
     this.getAccessToken(function(accessToken) {
       var request = jsonRequest('POST', url.retrieve, function() {
         if (request.readyState === 4 && request.status === 200) {
@@ -100,7 +100,7 @@ var PocketAPI = function() {
       var requestData = {
         consumer_key: consumerKey,
         access_token: accessToken,
-        search: search
+        domain: domain
       };
       request.send(JSON.stringify(requestData));
     });
@@ -137,13 +137,38 @@ var currentTabId = '';
 var api = new PocketAPI();
 chrome.webNavigation.onCommitted.addListener(function(details) {
   if (details.frameId === 0) {
-    chrome.pageAction.show(details.tabId);
+    var uri = new URI(details.url);
+    var found = false;
+    var key;
+
+    api.getItemsByDomain(uri.domain(), function(item) {
+      if (item.status !== 2) {
+        for (key in item.list) {
+          if (item.list[key].given_url === details.url) {
+            found = true;
+            chrome.pageAction.setIcon({'tabId': details.tabId, 'path': 'assets/icon_19.png'});
+            break;
+          }
+        }
+      }
+
+      if (found) {
+        chrome.pageAction.setIcon({'tabId': details.tabId, 'path': 'assets/icon_19.png'});
+      } else {
+        chrome.pageAction.setIcon({'tabId': details.tabId, 'path': 'assets/icon_blue_19.png'});
+      }
+
+      chrome.pageAction.show(details.tabId);
+    });
   }
 });
 
 chrome.pageAction.onClicked.addListener(function(tab) {
-  console.log('clicked.');
   api.getItem(tab.url, function(item) {
-    console.log(item);
+    if (item.status === 2) {
+      chrome.pageAction.setIcon({'tabId': tab.id, 'path': 'assets/icon_blue_19.png'});
+    } else {
+      chrome.pageAction.setIcon({'tabId': tab.id, 'path': 'assets/icon_19.png'});
+    }
   });
 });
