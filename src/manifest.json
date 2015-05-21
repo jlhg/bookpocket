@@ -12,6 +12,8 @@
   "background": {
     "scripts": [
       "vendor/URI.js",
+      "pocket_client.js",
+      "common.js",
       "background.js"
     ],
     "persistent": false
@@ -26,6 +28,7 @@
   "permissions": [
     "webNavigation",
     "identity",
+    "storage",
     "https://getpocket.com/"
   ]
 }
