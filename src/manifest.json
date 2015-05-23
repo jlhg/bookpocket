@@ -12,6 +12,9 @@
   "background": {
     "scripts": [
       "vendor/URI.js",
+      "config.js",
+      "pocket_client.js",
+      "common.js",
       "background.js"
     ],
     "persistent": false
@@ -21,11 +24,12 @@
       "19": "assets/icon_grey_19.png",
       "38": "assets/icon_grey_38.png"
     },
-    "default_title": "LetPocket"
+    "default_title": "LetPocket",
+    "default_popup": "popup.html"
   },
   "permissions": [
     "webNavigation",
-    "identity",
     "https://getpocket.com/"
-  ]
+  ],
+  "web_accessible_resources": ["oauth.html"]
 }
