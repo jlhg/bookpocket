@@ -7,30 +7,21 @@ var pocketRequest = function(method, url, callback) {
   xhr.setRequestHeader('X-Accept', 'application/json');
   xhr.onreadystatechange = callback;
   return xhr;
-}
-
-var PocketConfig = function() {
-  this.consumerKey = '40986-5d5c52c35d952de067604507';
-  this.redirectURI = chrome.identity.getRedirectURL();
 };
 
 var PocketURI = function() {
   this.base = 'https://getpocket.com';
   this.apiVersion = 'v3';
   this.apiBase = this.base + '/' + this.apiVersion;
-  this.oauthRequest = this.apiBase + '/oauth/request';
-  this.oauthAuthorize = this.apiBase + '/oauth/authorize';
+  this.oAuthRequest = this.apiBase + '/oauth/request';
+  this.oAuthAuthorize = this.apiBase + '/oauth/authorize';
   this.add = this.apiBase + '/add';
   this.modify = this.apiBase + '/send';
   this.retrieve = this.apiBase + '/get';
-  this.getUserRedirectURL = function(requestToken, redirectURI) {
-    return this.base + '/auth/authorize?request_token=' + requestToken + '&redirect_uri=' + redirectURI;
-  };
 }
 
-var PocketClient = function(pocketConfig) {
-  var config = pocketConfig;
-  var url = new PocketURI();
+var PocketClient = function(config) {
+  var uri = new PocketURI();
   var baseRequest = function(url) {
     var f = function(accessToken, data, success, error) {
       var request = pocketRequest('POST', url, function() {
@@ -63,8 +54,12 @@ var PocketClient = function(pocketConfig) {
     return f;
   };
 
-  this.getRequestToken = function(success, error) {
-    var request = pocketRequest('POST', url.oauthRequest, function() {
+  this.getUserRedirectURL = function(requestToken, redirectURI) {
+    return uri.base + '/auth/authorize?request_token=' + requestToken + '&redirect_uri=' + redirectURI;
+  };
+
+  this.getRequestToken = function(redirectURI, success, error) {
+    var request = pocketRequest('POST', uri.oAuthRequest, function() {
       var details;
       if (request.readyState === 4) {
         if (request.status === 200) {
@@ -80,14 +75,14 @@ var PocketClient = function(pocketConfig) {
 
     var requestData = {
       consumer_key: config.consumerKey,
-      redirect_uri: config.redirectURI
+      redirect_uri: redirectURI
     }
 
     request.send(JSON.stringify(requestData));
   };
 
   this.getAccessToken = function(requestToken, success, error) {
-    var request = pocketRequest('POST', url.oauthAuthorize, function() {
+    var request = pocketRequest('POST', uri.oAuthAuthorize, function() {
       var details;
       if (request.readyState === 4) {
         if (request.status === 200) {
@@ -109,7 +104,7 @@ var PocketClient = function(pocketConfig) {
     request.send(JSON.stringify(requestData));
   };
 
-  this.add = baseRequest(url.add);
-  this.modify = baseRequest(url.modify);
-  this.retrieve = baseRequest(url.retrieve);
+  this.add = baseRequest(uri.add);
+  this.modify = baseRequest(uri.modify);
+  this.retrieve = baseRequest(uri.retrieve);
 };
