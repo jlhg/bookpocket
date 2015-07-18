@@ -1,6 +1,6 @@
-var offlineIconPath = 'assets/icon_grey_19.png';
-var savedIconPath = 'assets/icon_19.png';
-var unsavedIconPath = 'assets/icon_blue_19.png';
+var offlineIconPath = 'assets/images/icon_grey_19.png';
+var savedIconPath = 'assets/images/icon_19.png';
+var unsavedIconPath = 'assets/images/icon_blue_19.png';
 
 var displayOfflineIcon = function(tabId) {
   chrome.pageAction.setIcon({'tabId': tabId, 'path': offlineIconPath});
@@ -38,4 +38,11 @@ var displayIcon = function(tabId, url, pocketItem) {
 var getAccessToken = function() {
   chrome.storage.local.get('access_token', function(){
   });
+};
+
+module.exports = {
+  displayIcon: displayIcon,
+  displaySavedIcon: displaySavedIcon,
+  displayOfflineIcon: displayOfflineIcon,
+  displayUnsavedIcon: displayUnsavedIcon
 };

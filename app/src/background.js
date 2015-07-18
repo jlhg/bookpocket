@@ -1,6 +1,10 @@
 'use strict';
 
-var client = new PocketClient(pocketConfig);
+var URI = require('URIjs');
+var config = require('./config.js');
+var PocketClient = require('./pocket_client.js');
+var common = require('./common.js');
+var client = new PocketClient(config.pocket);
 
 chrome.webNavigation.onCommitted.addListener(function(details) {
   if (details.frameId === 0) {
@@ -12,10 +16,10 @@ chrome.webNavigation.onCommitted.addListener(function(details) {
       domain: uri.host()
     };
     var success = function(pocketItems) {
-      displayIcon(details.tabId, details.url, pocketItems);
+      common.displayIcon(details.tabId, details.url, pocketItems);
     };
     var error = function() {
-      displayOfflineIcon(details.tabId);
+      common.displayOfflineIcon(details.tabId);
     };
 
     if (localStorage.accessToken) {

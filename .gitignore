@@ -2,3 +2,6 @@
 \#*\#
 .tern-port
 .module-cache
+node_modules
+npm-debug.log
+app/assets/javascripts

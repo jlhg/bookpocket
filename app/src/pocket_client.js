@@ -1,5 +1,3 @@
-'use strict';
-
 var pocketRequest = function(method, url, callback) {
   var xhr = new XMLHttpRequest();
   xhr.open(method, url, true);
@@ -108,3 +106,5 @@ var PocketClient = function(config) {
   this.modify = baseRequest(uri.modify);
   this.retrieve = baseRequest(uri.retrieve);
 };
+
+module.exports = PocketClient;

@@ -1,6 +1,8 @@
 'use strict';
 
-var client = new PocketClient(pocketConfig);
+var config = require('./config.js');
+var PocketClient = require('./pocket_client.js');
+var client = new PocketClient(config.pocket);
 
 var checkAuthResult = function() {
   if (localStorage.requestToken) {

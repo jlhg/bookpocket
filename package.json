@@ -1,0 +1,15 @@
+{
+  "name": "letpocket",
+  "version": "0.1.0",
+  "devDependencies": {
+    "URIjs": "^1.15.2",
+    "browserify": "^11.0.0",
+    "gulp": "^3.9.0",
+    "material-ui": "^0.10.1",
+    "react": "^0.13.3",
+    "react-tap-event-plugin": "^0.1.7",
+    "react-tools": "^0.13.3",
+    "reactify": "^1.1.1",
+    "vinyl-source-stream": "^1.1.0"
+  }
+}
