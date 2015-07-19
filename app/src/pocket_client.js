@@ -106,21 +106,24 @@ var PocketClient = function(config) {
   this.modify = baseRequest(uri.modify);
   this.retrieve = baseRequest(uri.retrieve);
 
+  // Find matched pocket item by URL.
   this.urlMatch = function(url, item) {
     var found = false;
+    var matchedItem;
     if (item.status === 0 || item.status === 1) {
       for (var k in item.list) {
         if (item.list[k].given_url === url) {
           found = true;
+          matchedItem = item.list[k];
           break;
         }
       }
     }
 
     if (found) {
-      return true;
+      return matchedItem;
     } else {
-      return false;
+      return null;
     }
   };
 };
