@@ -17,31 +17,12 @@ var displayUnsavedIcon = function(tabId) {
   chrome.pageAction.show(tabId);
 }
 
-var displayIcon = function(tabId, url, pocketItem) {
-  var found = false;
-  if (pocketItem.status === 0 || pocketItem.status === 1) {
-    for (var k in pocketItem.list) {
-      if (pocketItem.list[k].given_url === url) {
-        found = true;
-        break;
-      }
-    }
-  }
-
-  if (found) {
-    displaySavedIcon(tabId);
-  } else {
-    displayUnsavedIcon(tabId);
-  }
-};
-
 var getAccessToken = function() {
   chrome.storage.local.get('access_token', function(){
   });
 };
 
 module.exports = {
-  displayIcon: displayIcon,
   displaySavedIcon: displaySavedIcon,
   displayOfflineIcon: displayOfflineIcon,
   displayUnsavedIcon: displayUnsavedIcon

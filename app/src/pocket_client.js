@@ -105,6 +105,24 @@ var PocketClient = function(config) {
   this.add = baseRequest(uri.add);
   this.modify = baseRequest(uri.modify);
   this.retrieve = baseRequest(uri.retrieve);
+
+  this.urlMatch = function(url, item) {
+    var found = false;
+    if (item.status === 0 || item.status === 1) {
+      for (var k in item.list) {
+        if (item.list[k].given_url === url) {
+          found = true;
+          break;
+        }
+      }
+    }
+
+    if (found) {
+      return true;
+    } else {
+      return false;
+    }
+  };
 };
 
 module.exports = PocketClient;

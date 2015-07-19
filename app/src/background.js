@@ -16,7 +16,11 @@ chrome.webNavigation.onCommitted.addListener(function(details) {
       domain: uri.host()
     };
     var success = function(pocketItem) {
-      common.displayIcon(details.tabId, details.url, pocketItem);
+      if (client.urlMatch(details.url, pocketItem)) {
+        common.displaySavedIcon(details.tabId);
+      } else {
+        common.displayUnsavedIcon(details.tabId);
+      }
     };
     var error = function() {
       common.displayOfflineIcon(details.tabId);
