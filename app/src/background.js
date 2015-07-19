@@ -15,8 +15,8 @@ chrome.webNavigation.onCommitted.addListener(function(details) {
     var data = {
       domain: uri.host()
     };
-    var success = function(pocketItems) {
-      common.displayIcon(details.tabId, details.url, pocketItems);
+    var success = function(pocketItem) {
+      common.displayIcon(details.tabId, details.url, pocketItem);
     };
     var error = function() {
       common.displayOfflineIcon(details.tabId);
