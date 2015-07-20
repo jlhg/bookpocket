@@ -132,11 +132,15 @@ var PocketItem = React.createClass({
   },
 
   render: function() {
-    var itemTags = Object.keys(this.props.data.tags);
+    var itemTags = [];
     var closeIcon = <mui.FontIcon className="material-icons">close</mui.FontIcon>;
     var addItemButton;
     var archiveItemButton;
     var favoriteItemButton;
+
+    if (this.props.data.tags) {
+      itemTags = Object.keys(this.props.data.tags);
+    }
 
     if (this.state.isDeleted) {
       addItemButton = <mui.RaisedButton label="add"
@@ -200,7 +204,9 @@ if (localStorage.accessToken) {
       var itemTags = [];
       var pocketItemId = 'pocket_item';
       if (item) {
-        itemTags = Object.keys(item.tags);
+        if (item.tags) {
+          itemTags = Object.keys(item.tags);
+        }
 
         React.render(
           <PocketItem id={pocketItemId} data={item} />,
