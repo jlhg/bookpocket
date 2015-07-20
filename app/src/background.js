@@ -13,7 +13,8 @@ chrome.webNavigation.onCommitted.addListener(function(details) {
     var key;
 
     var data = {
-      domain: uri.host()
+      domain: uri.host(),
+      state: 'all'
     };
     var success = function(pocketItem) {
       if (client.urlMatch(details.url, pocketItem)) {

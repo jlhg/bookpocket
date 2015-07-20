@@ -144,7 +144,7 @@ var PocketItem = React.createClass({
 
     if (this.state.isDeleted) {
       addItemButton = <mui.RaisedButton label="add"
-                                        onClick={this.addIteme}
+                                        onClick={this.addItem}
                                         primary={true} />;
     } else {
       addItemButton = <mui.RaisedButton label="delete"
@@ -197,7 +197,8 @@ if (localStorage.accessToken) {
     var uri = new URI(currentTab.url);
     var data = {
       domain: uri.host(),
-      detailType: 'complete'
+      state: 'all',
+      detailType: 'complete',
     };
     var success = function(pocketItem) {
       var item = client.urlMatch(currentTab.url, pocketItem);
