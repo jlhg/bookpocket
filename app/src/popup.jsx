@@ -124,11 +124,45 @@ var PocketItem = React.createClass({
   },
 
   archiveItem: function(event) {
-
+    var self = this;
+    var data = {
+      actions: [{
+        action: 'archive',
+        item_id: this.props.data.item_id
+      }]
+    };
+    var error = function() {};
+    var success = function(details) {
+      // TODO
+      if (details.status === 1) {
+      } else {
+      }
+      self.setState({
+        isArchived: true
+      });
+    };
+    client.modify(localStorage.accessToken, data, success, error);
   },
 
   unarchiveItem: function(event) {
-
+    var self = this;
+    var data = {
+      actions: [{
+        action: 'readd',
+        item_id: this.props.data.item_id
+      }]
+    };
+    var error = function() {};
+    var success = function(details) {
+      // TODO
+      if (details.status === 1) {
+      } else {
+      }
+      self.setState({
+        isArchived: false
+      });
+    };
+    client.modify(localStorage.accessToken, data, success, error);
   },
 
   render: function() {
