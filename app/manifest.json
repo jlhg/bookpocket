@@ -7,27 +7,24 @@
   "author": "Jian-Long Huang",
   "minimum_chrome_version": "38",
   "icons": {
-    "128": "assets/icon_128.png"
+    "128": "assets/images/icon_128.png"
   },
   "background": {
     "scripts": [
-      "vendor/URI.js",
-      "config.js",
-      "pocket_client.js",
-      "common.js",
-      "background.js"
+      "assets/javascripts/background.bundle.js"
     ],
     "persistent": false
   },
   "page_action": {
     "default_icon": {
-      "19": "assets/icon_grey_19.png",
-      "38": "assets/icon_grey_38.png"
+      "19": "assets/images/icon_grey_19.png",
+      "38": "assets/images/icon_grey_38.png"
     },
     "default_title": "LetPocket",
     "default_popup": "popup.html"
   },
   "permissions": [
+    "tabs",
     "webNavigation",
     "https://getpocket.com/"
   ],
