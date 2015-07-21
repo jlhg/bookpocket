@@ -3,6 +3,7 @@ var URI = require('URIjs');
 var mui = require('material-ui');
 var config = require('./config.js');
 var PocketClient = require('./pocket_client.js');
+var common = require('./common.js');
 var client = new PocketClient(config.pocket);
 var ThemeManager = new mui.Styles.ThemeManager();
 
@@ -74,11 +75,37 @@ var PocketItem = React.createClass({
   },
 
   addItem: function(event) {
-
+    // TODO:
   },
 
   deleteItem: function(event) {
+    var self = this;
+    var data = {
+      actions: [{
+        action: 'delete',
+        item_id: this.props.data.item_id
+      }]
+    };
+    var error = function() {};
+    var success = function(details) {
+      // TODO:
+      if (details.status === 1) {
+      } else {
+      }
 
+      chrome.tabs.query({
+        active: true,
+        lastFocusedWindow: true
+      }, function(tabs) {
+        console.log(tabs);
+        var currentTab = tabs[0];
+        var afterDeleted = function() {
+          window.close();
+        };
+        common.displayUnsavedIcon(currentTab.id, afterDeleted);
+      });
+    };
+    client.modify(localStorage.accessToken, data, success, error);
   },
 
   favoriteItem: function(event) {
@@ -91,7 +118,7 @@ var PocketItem = React.createClass({
     };
     var error = function() {};
     var success = function(details) {
-      // TODO
+      // TODO:
       if (details.status === 1) {
       } else {
       }
@@ -112,7 +139,7 @@ var PocketItem = React.createClass({
     };
     var error = function() {};
     var success = function(details) {
-      // TODO
+      // TODO:
       if (details.status === 1) {
       } else {
       }
@@ -222,44 +249,68 @@ var PocketItem = React.createClass({
   }
 });
 
+var renderPocketItem = function(item) {
+  var itemTags = [];
+  if (item.tags) {
+    itemTags = Object.keys(item.tags);
+  }
+
+  React.render(
+    <PocketItem id={item.id} data={item} />,
+    document.getElementById('content')
+  );
+};
+
+var getPocketItem = function(url, success, error) {
+  var uri = new URI(url);
+  var data = {
+    domain: uri.host(),
+    state: 'all',
+    detailType: 'complete'
+  };
+  client.retrieve(localStorage.accessToken, data, success, error);
+};
+
 if (localStorage.accessToken) {
   chrome.tabs.query({
     active: true,
     lastFocusedWindow: true
   }, function(tabs) {
     var currentTab = tabs[0];
-    var uri = new URI(currentTab.url);
-    var data = {
-      domain: uri.host(),
-      state: 'all',
-      detailType: 'complete',
-    };
     var success = function(pocketItem) {
       var item = client.urlMatch(currentTab.url, pocketItem);
-      var itemTags = [];
-      var pocketItemId = 'pocket_item';
       if (item) {
-        if (item.tags) {
-          itemTags = Object.keys(item.tags);
-        }
-
-        React.render(
-          <PocketItem id={pocketItemId} data={item} />,
-          document.getElementById('content')
-        );
+        renderPocketItem(item);
+        common.displaySavedIcon(currentTab.id);
       } else {
-        var success = function(details) {};
-        var error = function() {};
-        client.add(localStorage.accessToken, data, success, error);
+        var data = {
+          url: currentTab.url
+        };
+        var successAddPocketItem = function(details) {
+          var successGetPocketItem = function(pocketItem) {
+            var item = client.urlMatch(currentTab.url, pocketItem);
+            if (item) {
+              renderPocketItem(item);
+              common.displaySavedIcon(currentTab.id);
+            } else {
+              // TODO: item was added but not retrieved later.
+            }
+          };
+          var errorGetPocketItem = function() {
+            // TODO:
+          };
+          getPocketItem(currentTab.url, successGetPocketItem, errorGetPocketItem);
+        };
+        var errorAddPocketItem = function() {
+          // TODO:
+        };
+        client.add(localStorage.accessToken, data, successAddPocketItem, errorAddPocketItem);
       }
     };
     var error = function() {
-      React.render(
-        React.createElement(PocketError, {message: "Can't add a pocket item."}),
-        document.getElementById('content')
-      );
+      // TODO:
     };
-    client.retrieve(localStorage.accessToken, data, success, error);
+    getPocketItem(currentTab.url, success, error);
   });
 } else {
   var authorizeButtonId = "btn-authorize";
