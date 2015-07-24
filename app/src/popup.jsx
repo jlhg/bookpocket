@@ -57,6 +57,7 @@ var PocketItem = React.createClass({
 
   getInitialState: function() {
     var state = {
+      userInputTags: '',
       isFavorited: false,
       isArchived: false,
       isDeleted: false,
@@ -216,9 +217,14 @@ var PocketItem = React.createClass({
     client.modify(localStorage.accessToken, data, success, error);
   },
 
+  setUserInputTags: function(event) {
+    this.setState({userInputTags: event.target.value});
+  },
+
   addTag: function(event) {
     var self = this;
-    var tag = document.getElementById('text_add_tag').value;
+    var textAddTags = document.getElementById('text_add_tags');
+    var tag = this.state.userInputTags.trim().toLowerCase();
     var data = {
       actions: [{
         action: 'tags_add',
@@ -232,7 +238,10 @@ var PocketItem = React.createClass({
     };
 
     var success = function(details) {
-      // TODO
+      self.setState({userInputTags: ''}, function() {
+        textAddTags.focus();
+      });
+      // TODO      
       if (details.status === 1) {
       } else {
       }
@@ -255,11 +264,42 @@ var PocketItem = React.createClass({
   },
 
   deleteTag: function(event) {
+    var self = this;
+    var tag = event.target.getAttribute("data-tag");
+    var data = {
+      actions: [{
+        action: 'tags_remove',
+        tags: tag,
+        item_id: this.props.data.item_id
+      }]
+    };
 
+    var error = function() {
+      // TODO:
+    };
+
+    var success = function(details) {
+      // TODO
+      if (details.status === 1) {
+      } else {
+      }
+      var newTags = {};
+      var updateTags;
+
+      newTags[tag] = false;
+      updateTags = React.addons.update(self.state.tags, {
+        $merge: newTags
+      });
+      self.setState({
+        tags: updateTags
+      });
+    };
+
+    client.modify(localStorage.accessToken, data, success, error);
   },
 
   render: function() {
-    var closeIcon = <mui.FontIcon className="material-icons">close</mui.FontIcon>;
+    var self = this;
     var addItemButton;
     var archiveItemButton;
     var favoriteItemButton;
@@ -301,11 +341,22 @@ var PocketItem = React.createClass({
         </div>
         <mui.List subheader={this.props.tagsHeader} id="tag_list">
           {Object.keys(this.state.tags).map(function(tag) {
-            return <mui.ListItem key={tag} primaryText={tag} rightIcon={closeIcon} />;
+            if (self.state.tags[tag]) {
+              var closeIcon = <mui.FontIcon className="material-icons"
+                                            data-tag={tag}
+                                            onClick={self.deleteTag}>close</mui.FontIcon>;
+              return <mui.ListItem key={tag} primaryText={tag} rightIcon={closeIcon} />;
+            }
            })}
         </mui.List>
-        <mui.TextField hintText="Add tag" id="text_add_tag"/>
-        <mui.RaisedButton label="Add" secondary={true} id="btn_add_tag" onClick={this.addTag} />
+        <mui.TextField id="text_add_tags"
+                       hintText="Add tag"
+                       value={this.state.userInputTags}
+                       onChange={this.setUserInputTags} />
+        <mui.RaisedButton label="Add"
+                          secondary={true}
+                          id="btn_add_tag"
+                          onClick={this.addTag} />
       </div>
     );
   }
