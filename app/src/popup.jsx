@@ -47,7 +47,9 @@ var PocketItemContent = React.createClass({
 
   getInitialState: function() {
     var state = {
-      isSaved: false,
+      error: false,
+      errorMessage: '',
+      isRetrieved: false,
       userInputTags: '',
       isFavorited: false,
       isArchived: false,
@@ -73,7 +75,7 @@ var PocketItemContent = React.createClass({
     var cachedItem = localStorage[this.props.url];
     if (cachedItem) {
       this.setState(this.parseItemToState(JSON.parse(cachedItem)));
-      this.setState({isSaved: true});
+      this.setState({isRetrieved: true});
     }
 
     this.updateStatus(null, function() {
@@ -81,7 +83,26 @@ var PocketItemContent = React.createClass({
         url: self.props.url
       };
       var successAddItem = function() {
-        self.updateStatus();
+        var retryUpdateStatus = 3;
+        var retryUpdateStatusInterval = 1000 * 1;
+        var currentRetryUpdateStatus = 0;
+        var updateStatusInterval = setInterval(function() {
+          var success = function() {
+            clearInterval(updateStatusInterval);
+          };
+          var fail = function() {
+            console.log('The item was not found, retry again.');
+            currentRetryUpdateStatus += 1;
+            if (currentRetryUpdateStatus > retryUpdateStatus) {
+              self.setState({
+                error: true,
+                errorMessage: "The item was not found."
+              });
+              clearInterval(updateStatusInterval);
+            }
+          };
+          self.updateStatus(success, fail);
+        }, retryUpdateStatusInterval);
       };
       var errorAddItem = function() {};
       client.add(localStorage.accessToken,
@@ -144,7 +165,7 @@ var PocketItemContent = React.createClass({
       if (item) {
         common.displaySavedIcon(self.props.tabId, function() {
           self.setState(self.parseItemToState(item));
-          self.setState({isSaved: true});
+          self.setState({isRetrieved: true});
           common.itemCache.set(item);
           if (success) {
             success();
@@ -157,7 +178,10 @@ var PocketItemContent = React.createClass({
       }
     };
     var errorGetItem = function() {
-      // TODO: 
+      self.setState({
+        error: true,
+        errorMessage: "Can't retrieve the Pocket item."
+      });
     };
     client.retrieve(localStorage.accessToken, data, successGetItem, errorGetItem);
   },
@@ -175,7 +199,10 @@ var PocketItemContent = React.createClass({
       }]
     };
     var error = function() {
-      // TODO: 
+      self.setState({
+        error: true,
+        errorMessage: "Can't delete the Pocket item."
+      });
     };
     var success = function(details) {
       if (details.status === 1) {
@@ -201,7 +228,10 @@ var PocketItemContent = React.createClass({
       }]
     };
     var error = function() {
-      // TODO: 
+      self.setState({
+        error: true,
+        errorMessage: "Can't favorite the Pocket item."
+      });
     };
     var success = function(details) {
       if (details.status === 1) {
@@ -228,7 +258,10 @@ var PocketItemContent = React.createClass({
       }]
     };
     var error = function() {
-      // TODO: 
+      self.setState({
+        error: true,
+        errorMessage: "Can't unfavorite the Pocket item."
+      });
     };
     var success = function(details) {
       if (details.status === 1) {
@@ -255,7 +288,10 @@ var PocketItemContent = React.createClass({
       }]
     };
     var error = function() {
-      // TODO: 
+      self.setState({
+        error: true,
+        errorMessage: "Can't archive the Pocket item."
+      });
     };
     var success = function(details) {
       if (details.status === 1) {
@@ -282,7 +318,10 @@ var PocketItemContent = React.createClass({
       }]
     };
     var error = function() {
-      // TODO: 
+      self.setState({
+        error: true,
+        errorMessage: "Can't unarchive the Pocket item."
+      });
     };
     var success = function(details) {
       if (details.status === 1) {
@@ -317,7 +356,10 @@ var PocketItemContent = React.createClass({
     };
 
     var error = function() {
-      // TODO:
+      self.setState({
+        error: true,
+        errorMessage: "Can't add the tags."
+      });
     };
 
     var success = function(details) {
@@ -365,7 +407,10 @@ var PocketItemContent = React.createClass({
     };
 
     var error = function() {
-      // TODO:
+      self.setState({
+        error: true,
+        errorMessage: "Can't delete the tag."
+      });
     };
 
     var success = function(details) {
@@ -484,8 +529,17 @@ var PocketItemContent = React.createClass({
       </div>
     </div>;
 
-    if (!this.state.isSaved) {
+    var errorContent =
+    <div>
+      <p>The error has occurred: {this.state.errorMessage}</p>
+    </div>;
+
+    if (!this.state.isRetrieved) {
       content = inProgressContent;
+    }
+
+    if (this.state.error) {
+      content = errorContent;
     }
 
     return (
