@@ -86,9 +86,9 @@ var PocketItemContent = React.createClass({
         var retryUpdateStatus = 3;
         var retryUpdateStatusInterval = 1000 * 1;
         var currentRetryUpdateStatus = 0;
-        var updateStatusInterval = setInterval(function() {
+        var updateStatusInterval = window.setInterval(function() {
           var success = function() {
-            clearInterval(updateStatusInterval);
+            window.clearInterval(updateStatusInterval);
           };
           var fail = function() {
             console.log('The item was not found, retry again.');
@@ -98,7 +98,7 @@ var PocketItemContent = React.createClass({
                 error: true,
                 errorMessage: "The item was not found."
               });
-              clearInterval(updateStatusInterval);
+              window.clearInterval(updateStatusInterval);
             }
           };
           self.updateStatus(success, fail);
