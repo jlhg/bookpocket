@@ -47,6 +47,7 @@ var PocketItemContent = React.createClass({
 
   getInitialState: function() {
     var state = {
+      isSaved: false,
       userInputTags: '',
       isFavorited: false,
       isArchived: false,
@@ -72,16 +73,20 @@ var PocketItemContent = React.createClass({
     var cachedItem = localStorage[this.props.url];
     if (cachedItem) {
       this.setState(this.parseItemToState(JSON.parse(cachedItem)));
+      this.setState({isSaved: true});
     }
 
     this.updateStatus(null, function() {
       var data = {
         url: self.props.url
       };
+      var successAddItem = function() {
+        self.updateStatus();
+      };
       var errorAddItem = function() {};
       client.add(localStorage.accessToken,
                  data,
-                 self.updateStatus,
+                 successAddItem,
                  errorAddItem);
     });
   },
@@ -137,12 +142,14 @@ var PocketItemContent = React.createClass({
     var successGetItem = function(pocketItem) {
       var item = client.urlMatch(self.props.url, pocketItem);
       if (item) {
-        self.setState(self.parseItemToState(item));
-        common.displaySavedIcon(self.props.tabId);
-        common.itemCache.set(item);
-        if (success) {
-          success();
-        }
+        common.displaySavedIcon(self.props.tabId, function() {
+          self.setState(self.parseItemToState(item));
+          self.setState({isSaved: true});
+          common.itemCache.set(item);
+          if (success) {
+            success();
+          }
+        });
       } else {
         if (fail) {
           fail();
@@ -389,7 +396,7 @@ var PocketItemContent = React.createClass({
     var archiveItemButton;
     var favoriteItemButton;
     var btnLabelStyle = {
-      fontSize: 10
+      fontSize: "10px"
     };
     var btnStyle = {
       marginLegt: "12px",
@@ -438,33 +445,52 @@ var PocketItemContent = React.createClass({
                                              onClick={this.favoriteItem} />;
     }
 
+    var content =
+    <div>
+      <mui.List subheader={this.props.tagsHeader}
+                subheaderStyle={{fontSize: "16px"}}>
+        {Object.keys(this.state.tags).map(function(tag) {
+          if (self.state.tags[tag]) {
+            var closeIcon = <mui.FontIcon className="material-icons"
+                                          data-tag={tag}
+                                          onClick={self.deleteTag}>close</mui.FontIcon>;
+            return <mui.ListItem key={tag}
+                                 primaryText={tag}
+                                 rightIcon={closeIcon}
+                                 style={{fontSize: "14px"}}/>;
+          }
+         })}
+      </mui.List>
+      <mui.TextField hintText="Add tags"
+                     ref="textAddTags"
+                     value={this.state.userInputTags}
+                     fullWidth={true}
+                     onChange={this.setUserInputTags}
+                     onEnterKeyDown={this.addTag} />
+      <div style={{marginTop: "10px"}}>
+        {archiveItemButton}
+        {favoriteItemButton}
+        {addItemButton}
+      </div>
+    </div>;
+
+    var inProgressContent =
+    <div>
+      <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+        <p style={{fontSize: "16px", fontWeight: "bold"}}>Saving</p>
+      </div>
+      <div style={{display: "flex", justifyContent: "center", alignItems: "center", height: "100px"}}>
+        <mui.CircularProgress mode="indeterminate" size={1} />
+      </div>
+    </div>;
+
+    if (!this.state.isSaved) {
+      content = inProgressContent;
+    }
+
     return (
       <div style={{width: "340px", marginLeft: "10px", marginRight: "10px"}}>
-        <mui.List subheader={this.props.tagsHeader}
-                  subheaderStyle={{fontSize: "16px"}}>
-          {Object.keys(this.state.tags).map(function(tag) {
-            if (self.state.tags[tag]) {
-              var closeIcon = <mui.FontIcon className="material-icons"
-                                            data-tag={tag}
-                                            onClick={self.deleteTag}>close</mui.FontIcon>;
-              return <mui.ListItem key={tag}
-                                   primaryText={tag}
-                                   rightIcon={closeIcon}
-                                   style={{fontSize: "14px"}}/>;
-            }
-           })}
-        </mui.List>
-        <mui.TextField hintText="Add tags"
-                       ref="textAddTags"
-                       value={this.state.userInputTags}
-                       fullWidth={true}
-                       onChange={this.setUserInputTags}
-                       onEnterKeyDown={this.addTag} />
-        <div style={{marginTop: "10px"}}>
-          {archiveItemButton}
-          {favoriteItemButton}
-          {addItemButton}
-        </div>
+        {content}
       </div>
     );
   }
