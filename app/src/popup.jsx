@@ -34,7 +34,7 @@ var AuthorizeContent = React.createClass({
   }
 });
 
-var PocketItem = React.createClass({
+var PocketItemContent = React.createClass({
   childContextTypes: {
     muiTheme: React.PropTypes.object
   },
@@ -54,7 +54,49 @@ var PocketItem = React.createClass({
       tags: {},
     };
 
-    switch (this.props.data.status) {
+    return state;
+  },
+
+  getDefaultProps: function() {
+    var props = {
+      tagsHeader: "Tags"
+    };
+
+    return props;
+  },
+
+  componentDidMount: function() {
+    var self = this;
+
+    // Load cached data first.
+    var cachedItem = localStorage[this.props.url];
+    if (cachedItem) {
+      this.setState(this.parseItemToState(JSON.parse(cachedItem)));
+    }
+
+    this.updateStatus(null, function() {
+      var data = {
+        url: self.props.url
+      };
+      var errorAddItem = function() {};
+      client.add(localStorage.accessToken,
+                 data,
+                 self.updateStatus,
+                 errorAddItem);
+    });
+  },
+
+  parseItemToState: function(item) {
+    var state = {
+      itemId: '',
+      isFavorited: false,
+      isArchived: false,
+      isDeleted: false,
+      tags: {},
+    };
+    state.itemId = item.item_id;
+
+    switch (item.status) {
       case '0':
         state.isArchived = false;
         break;
@@ -66,7 +108,7 @@ var PocketItem = React.createClass({
         break;
     }
 
-    switch (this.props.data.favorite) {
+    switch (item.favorite) {
       case '0':
         state.isFavorited = false;
         break;
@@ -75,8 +117,8 @@ var PocketItem = React.createClass({
         break;
     }
 
-    if (this.props.data.tags) {
-      for (var k in this.props.data.tags) {
+    if (item.tags) {
+      for (var k in item.tags) {
         state.tags[k] = true;
       }
     }
@@ -84,10 +126,33 @@ var PocketItem = React.createClass({
     return state;
   },
 
-  getDefaultProps: function() {
-    return {
-      tagsHeader: "Tags"
+  updateStatus: function(success, fail) {
+    var self = this;
+    var uri = new URI(this.props.url);
+    var data = {
+      domain: uri.host(),
+      state: 'all',
+      detailType: 'complete'
     };
+    var successGetItem = function(pocketItem) {
+      var item = client.urlMatch(self.props.url, pocketItem);
+      if (item) {
+        self.setState(self.parseItemToState(item));
+        common.displaySavedIcon(self.props.tabId);
+        common.itemCache.set(item);
+        if (success) {
+          success();
+        }
+      } else {
+        if (fail) {
+          fail();
+        }
+      }
+    };
+    var errorGetItem = function() {
+      // TODO: 
+    };
+    client.retrieve(localStorage.accessToken, data, successGetItem, errorGetItem);
   },
 
   addItem: function(event) {
@@ -99,25 +164,22 @@ var PocketItem = React.createClass({
     var data = {
       actions: [{
         action: 'delete',
-        item_id: this.props.data.item_id
+        item_id: this.state.itemId
       }]
     };
-    var error = function() {};
+    var error = function() {
+      // TODO: 
+    };
     var success = function(details) {
-      // TODO:
       if (details.status === 1) {
+        // TODO:
       } else {
+
       }
 
-      chrome.tabs.query({
-        active: true,
-        lastFocusedWindow: true
-      }, function(tabs) {
-        var currentTab = tabs[0];
-        var afterDeleted = function() {
-          window.close();
-        };
-        common.displayUnsavedIcon(currentTab.id, afterDeleted);
+      delete localStorage[self.props.url];
+      common.displayUnsavedIcon(self.props.tabId, function() {
+        window.close();
       });
     };
     client.modify(localStorage.accessToken, data, success, error);
@@ -128,18 +190,24 @@ var PocketItem = React.createClass({
     var data = {
       actions: [{
         action: 'favorite',
-        item_id: this.props.data.item_id
+        item_id: this.state.itemId
       }]
     };
-    var error = function() {};
+    var error = function() {
+      // TODO: 
+    };
     var success = function(details) {
-      // TODO:
       if (details.status === 1) {
+        // TODO: 
       } else {
+
       }
+
       self.setState({
         isFavorited: true
       });
+
+      self.updateStatus();
     };
     client.modify(localStorage.accessToken, data, success, error);
   },
@@ -149,18 +217,24 @@ var PocketItem = React.createClass({
     var data = {
       actions: [{
         action: 'unfavorite',
-        item_id: this.props.data.item_id
+        item_id: this.state.itemId
       }]
     };
-    var error = function() {};
+    var error = function() {
+      // TODO: 
+    };
     var success = function(details) {
-      // TODO:
       if (details.status === 1) {
+        // TODO:
       } else {
+
       }
+
       self.setState({
         isFavorited: false
       });
+
+      self.updateStatus();
     };
     client.modify(localStorage.accessToken, data, success, error);
   },
@@ -170,18 +244,24 @@ var PocketItem = React.createClass({
     var data = {
       actions: [{
         action: 'archive',
-        item_id: this.props.data.item_id
+        item_id: this.state.itemId
       }]
     };
-    var error = function() {};
+    var error = function() {
+      // TODO: 
+    };
     var success = function(details) {
-      // TODO
       if (details.status === 1) {
+        // TODO: 
       } else {
+
       }
+
       self.setState({
         isArchived: true
       });
+
+      self.updateStatus();
     };
     client.modify(localStorage.accessToken, data, success, error);
   },
@@ -191,18 +271,24 @@ var PocketItem = React.createClass({
     var data = {
       actions: [{
         action: 'readd',
-        item_id: this.props.data.item_id
+        item_id: this.state.itemId
       }]
     };
-    var error = function() {};
+    var error = function() {
+      // TODO: 
+    };
     var success = function(details) {
-      // TODO
       if (details.status === 1) {
+        // TODO: 
       } else {
+
       }
+
       self.setState({
         isArchived: false
       });
+
+      self.updateStatus();
     };
     client.modify(localStorage.accessToken, data, success, error);
   },
@@ -219,7 +305,7 @@ var PocketItem = React.createClass({
       actions: [{
         action: 'tags_add',
         tags: tag,
-        item_id: this.props.data.item_id
+        item_id: this.state.itemId
       }]
     };
 
@@ -231,10 +317,12 @@ var PocketItem = React.createClass({
       self.setState({userInputTags: ''}, function() {
         textAddTags.focus();
       });
-      // TODO      
+
       if (details.status === 1) {
+        // TODO              
       } else {
       }
+
       var tags = tag.split(',');
       var newTags = {};
       var updateTags;
@@ -251,6 +339,8 @@ var PocketItem = React.createClass({
       self.setState({
         tags: updateTags
       });
+
+      self.updateStatus();
     };
 
     client.modify(localStorage.accessToken, data, success, error);
@@ -263,7 +353,7 @@ var PocketItem = React.createClass({
       actions: [{
         action: 'tags_remove',
         tags: tag,
-        item_id: this.props.data.item_id
+        item_id: this.state.itemId
       }]
     };
 
@@ -272,13 +362,13 @@ var PocketItem = React.createClass({
     };
 
     var success = function(details) {
-      // TODO
       if (details.status === 1) {
+        // TODO        
       } else {
+
       }
       var newTags = {};
       var updateTags;
-
       newTags[tag] = false;
       updateTags = React.addons.update(self.state.tags, {
         $merge: newTags
@@ -286,6 +376,8 @@ var PocketItem = React.createClass({
       self.setState({
         tags: updateTags
       });
+
+      self.updateStatus();
     };
 
     client.modify(localStorage.accessToken, data, success, error);
@@ -378,72 +470,24 @@ var PocketItem = React.createClass({
   }
 });
 
-var renderPocketItem = function(item) {
-  var itemTags = [];
-  if (item.tags) {
-    itemTags = Object.keys(item.tags);
+var renderPopupContent = function() {
+  if (localStorage.accessToken) {
+    chrome.tabs.query({
+      active: true,
+      lastFocusedWindow: true
+    }, function(tabs) {
+      var currentTab = tabs[0];
+      React.render(
+        <PocketItemContent tabId={currentTab.id} url={currentTab.url} />,
+        document.getElementById('content')
+      );
+    });
+  } else {
+    React.render(
+      <AuthorizeContent />,
+      document.getElementById('content')
+    );
   }
-
-  React.render(
-    <PocketItem id={item.id} data={item} />,
-    document.getElementById('content')
-  );
 };
 
-var getPocketItem = function(url, success, error) {
-  var uri = new URI(url);
-  var data = {
-    domain: uri.host(),
-    state: 'all',
-    detailType: 'complete'
-  };
-  client.retrieve(localStorage.accessToken, data, success, error);
-};
-
-if (localStorage.accessToken) {
-  chrome.tabs.query({
-    active: true,
-    lastFocusedWindow: true
-  }, function(tabs) {
-    var currentTab = tabs[0];
-    var success = function(pocketItem) {
-      var item = client.urlMatch(currentTab.url, pocketItem);
-      if (item) {
-        renderPocketItem(item);
-        common.displaySavedIcon(currentTab.id);
-      } else {
-        var data = {
-          url: currentTab.url
-        };
-        var successAddPocketItem = function(details) {
-          var successGetPocketItem = function(pocketItem) {
-            var item = client.urlMatch(currentTab.url, pocketItem);
-            if (item) {
-              renderPocketItem(item);
-              common.displaySavedIcon(currentTab.id);
-            } else {
-              // TODO: item was added but not retrieved later.
-            }
-          };
-          var errorGetPocketItem = function() {
-            // TODO:
-          };
-          getPocketItem(currentTab.url, successGetPocketItem, errorGetPocketItem);
-        };
-        var errorAddPocketItem = function() {
-          // TODO:
-        };
-        client.add(localStorage.accessToken, data, successAddPocketItem, errorAddPocketItem);
-      }
-    };
-    var error = function() {
-      // TODO:
-    };
-    getPocketItem(currentTab.url, success, error);
-  });
-} else {
-  React.render(
-    <AuthorizeContent />,
-    document.getElementById('content')
-  );
-}
+document.addEventListener("DOMContentLoaded", renderPopupContent);

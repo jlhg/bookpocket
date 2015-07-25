@@ -5,6 +5,7 @@ var config = require('./config.js');
 var PocketClient = require('./pocket_client.js');
 var common = require('./common.js');
 var client = new PocketClient(config.pocket);
+var runClearItemCacheInterval = 1000 * 60 * 60 * 3;
 
 chrome.webNavigation.onCommitted.addListener(function(details) {
   if (details.frameId === 0) {
@@ -14,14 +15,20 @@ chrome.webNavigation.onCommitted.addListener(function(details) {
 
     var data = {
       domain: uri.host(),
-      state: 'all'
+      state: 'all',
+      detailType: 'complete'
     };
     var success = function(pocketItem) {
-      if (client.urlMatch(details.url, pocketItem)) {
+      var matchedItem = client.urlMatch(details.url, pocketItem);
+      if (matchedItem) {
         common.displaySavedIcon(details.tabId);
+        common.itemCache.set(matchedItem);
       } else {
         common.displayUnsavedIcon(details.tabId);
       }
+
+
+
     };
     var error = function() {
       common.displayOfflineIcon(details.tabId);
@@ -34,3 +41,7 @@ chrome.webNavigation.onCommitted.addListener(function(details) {
     }
   }
 });
+
+// TODO:
+var clearItemCache = function() {};
+// window.setInterval(clearItemCache, runClearItemCacheInterval);
