@@ -7,7 +7,7 @@ var common = require('./common.js');
 var client = new PocketClient(config.pocket);
 var ThemeManager = new mui.Styles.ThemeManager();
 
-var AuthorizeButton = React.createClass({
+var AuthorizeContent = React.createClass({
   childContextTypes: {
     muiTheme: React.PropTypes.object
   },
@@ -18,31 +18,21 @@ var AuthorizeButton = React.createClass({
     };
   },
 
+  startAuthFlow: function(event) {
+    var redirectURI = chrome.extension.getURL('oauth.html');
+    client.getRequestToken(redirectURI, function(details) {
+      var requestToken = details.code;
+      localStorage.setItem('requestToken', requestToken);
+      window.open(client.getUserRedirectURL(requestToken, redirectURI), '_blank');
+    });
+  },
+
   render: function() {
     return (
-      <mui.RaisedButton label={this.props.children}
-                        id={this.props.id} />
+      <mui.RaisedButton label="Authorize" onClick={this.startAuthFlow} />
     );
   }
 });
-
-/* var AddTagButton = React.createClass({
-   childContextTypes: {
-   muiTheme: React.PropTypes.object
-   },
-
-   getChildContext: function() {
-   return {
-   muiTheme: ThemeManager.getCurrentTheme()
-   };
-   },
-
-   render: function() {
-   return (
-   <mui.TextField hintText="Add tag" />
-   );
-   }
-   }); */
 
 var PocketItem = React.createClass({
   childContextTypes: {
@@ -223,7 +213,7 @@ var PocketItem = React.createClass({
 
   addTag: function(event) {
     var self = this;
-    var textAddTags = document.getElementById('text_add_tags');
+    var textAddTags = React.findDOMNode(this.refs.textAddTags);
     var tag = this.state.userInputTags.trim().toLowerCase();
     var data = {
       actions: [{
@@ -250,7 +240,10 @@ var PocketItem = React.createClass({
       var updateTags;
 
       for (var i = 0; i < tags.length; ++i) {
-        newTags[tags[i]] = true;
+        tags[i] = tags[i].trim();
+        if (tags[i]) {
+          newTags[tags[i]] = true;
+        }
       }
       updateTags = React.addons.update(self.state.tags, {
         $merge: newTags
@@ -303,60 +296,83 @@ var PocketItem = React.createClass({
     var addItemButton;
     var archiveItemButton;
     var favoriteItemButton;
+    var btnLabelStyle = {
+      fontSize: 10
+    };
+    var btnStyle = {
+      marginLegt: "12px",
+      marginRight: "12px"
+    };
 
     if (this.state.isDeleted) {
       addItemButton = <mui.RaisedButton label="add"
-                                        onClick={this.addItem}
-                                        primary={true} />;
+                                        labelStyle={btnLabelStyle}
+                                        style={btnStyle}
+                                        primary={true}
+                                        onClick={this.addItem} />;
     } else {
       addItemButton = <mui.RaisedButton label="delete"
-                                        onClick={this.deleteItem}
-                                        primary={true} />;
+                                        labelStyle={btnLabelStyle}
+                                        style={btnStyle}
+                                        primary={true}
+                                        onClick={this.deleteItem} />;
     }
 
     if (this.state.isArchived) {
       archiveItemButton = <mui.RaisedButton label="unarchive"
+                                            labelStyle={btnLabelStyle}
+                                            style={btnStyle}
+                                            secondary={true}
                                             onClick={this.unarchiveItem} />;
     } else {
       archiveItemButton = <mui.RaisedButton label="archive"
+                                            labelStyle={btnLabelStyle}
+                                            style={btnStyle}
+                                            secondary={true}
                                             onClick={this.archiveItem} />;
     }
 
     if (this.state.isFavorited) {
       favoriteItemButton = <mui.RaisedButton label="unfavorite"
-                                             onClick={this.unfavoriteItem}
-                                             secondary={true} />;
+                                             labelStyle={btnLabelStyle}
+                                             style={btnStyle}
+                                             secondary={true}
+                                             onClick={this.unfavoriteItem} />;
     } else {
       favoriteItemButton = <mui.RaisedButton label="favorite"
-                                             onClick={this.favoriteItem}
-                                             secondary={true} />;
+                                             labelStyle={btnLabelStyle}
+                                             style={btnStyle}
+                                             secondary={true}
+                                             onClick={this.favoriteItem} />;
     }
 
     return (
-      <div>
-        <div>
-          {archiveItemButton}
-          {favoriteItemButton}
-          {addItemButton}
-        </div>
-        <mui.List subheader={this.props.tagsHeader} id="tag_list">
+      <div style={{width: "340px", marginLeft: "10px", marginRight: "10px"}}>
+        <mui.List subheader={this.props.tagsHeader}
+                  subheaderStyle={{fontSize: "16px"}}>
           {Object.keys(this.state.tags).map(function(tag) {
             if (self.state.tags[tag]) {
               var closeIcon = <mui.FontIcon className="material-icons"
                                             data-tag={tag}
                                             onClick={self.deleteTag}>close</mui.FontIcon>;
-              return <mui.ListItem key={tag} primaryText={tag} rightIcon={closeIcon} />;
+              return <mui.ListItem key={tag}
+                                   primaryText={tag}
+                                   rightIcon={closeIcon}
+                                   style={{fontSize: "14px"}}/>;
             }
            })}
         </mui.List>
-        <mui.TextField id="text_add_tags"
-                       hintText="Add tag"
+        <mui.TextField hintText="Add tags"
+                       ref="textAddTags"
                        value={this.state.userInputTags}
-                       onChange={this.setUserInputTags} />
-        <mui.RaisedButton label="Add"
-                          secondary={true}
-                          id="btn_add_tag"
-                          onClick={this.addTag} />
+                       fullWidth={true}
+                       onChange={this.setUserInputTags}
+                       onEnterKeyDown={this.addTag} />
+        <div style={{marginTop: "10px"}}>
+          {archiveItemButton}
+          {favoriteItemButton}
+          {addItemButton}
+        </div>
       </div>
     );
   }
@@ -426,19 +442,8 @@ if (localStorage.accessToken) {
     getPocketItem(currentTab.url, success, error);
   });
 } else {
-  var authorizeButtonId = "btn-authorize";
-
   React.render(
-    <AuthorizeButton id={authorizeButtonId}>Authorize</AuthorizeButton>,
+    <AuthorizeContent />,
     document.getElementById('content')
   );
-
-  document.getElementById(authorizeButtonId).addEventListener('click', function(e) {
-    var redirectURI = chrome.extension.getURL('oauth.html');
-    client.getRequestToken(redirectURI, function(details) {
-      var requestToken = details.code;
-      localStorage.setItem('requestToken', requestToken);
-      window.open(client.getUserRedirectURL(requestToken, redirectURI), '_blank');
-    });
-  });
 }
