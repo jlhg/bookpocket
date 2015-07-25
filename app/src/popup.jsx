@@ -22,7 +22,7 @@ var AuthorizeContent = React.createClass({
     var redirectURI = chrome.extension.getURL('oauth.html');
     client.getRequestToken(redirectURI, function(details) {
       var requestToken = details.code;
-      localStorage.setItem('requestToken', requestToken);
+      window.localStorage.setItem('requestToken', requestToken);
       window.open(client.getUserRedirectURL(requestToken, redirectURI), '_blank');
     });
   },
@@ -72,7 +72,7 @@ var PocketItemContent = React.createClass({
     var self = this;
 
     // Load cached data first.
-    var cachedItem = localStorage[this.props.url];
+    var cachedItem = window.localStorage[this.props.url];
     if (cachedItem) {
       this.setState(this.parseItemToState(JSON.parse(cachedItem)));
       this.setState({isRetrieved: true});
@@ -105,7 +105,7 @@ var PocketItemContent = React.createClass({
         }, retryUpdateStatusInterval);
       };
       var errorAddItem = function() {};
-      client.add(localStorage.accessToken,
+      client.add(window.localStorage.accessToken,
                  data,
                  successAddItem,
                  errorAddItem);
@@ -183,7 +183,7 @@ var PocketItemContent = React.createClass({
         errorMessage: "Can't retrieve the Pocket item."
       });
     };
-    client.retrieve(localStorage.accessToken, data, successGetItem, errorGetItem);
+    client.retrieve(window.localStorage.accessToken, data, successGetItem, errorGetItem);
   },
 
   addItem: function(event) {
@@ -211,12 +211,12 @@ var PocketItemContent = React.createClass({
 
       }
 
-      delete localStorage[self.props.url];
+      window.localStorage.removeItem(self.props.url);
       common.displayUnsavedIcon(self.props.tabId, function() {
         window.close();
       });
     };
-    client.modify(localStorage.accessToken, data, success, error);
+    client.modify(window.localStorage.accessToken, data, success, error);
   },
 
   favoriteItem: function(event) {
@@ -246,7 +246,7 @@ var PocketItemContent = React.createClass({
 
       self.updateStatus();
     };
-    client.modify(localStorage.accessToken, data, success, error);
+    client.modify(window.localStorage.accessToken, data, success, error);
   },
 
   unfavoriteItem: function(event) {
@@ -276,7 +276,7 @@ var PocketItemContent = React.createClass({
 
       self.updateStatus();
     };
-    client.modify(localStorage.accessToken, data, success, error);
+    client.modify(window.localStorage.accessToken, data, success, error);
   },
 
   archiveItem: function(event) {
@@ -306,7 +306,7 @@ var PocketItemContent = React.createClass({
 
       self.updateStatus();
     };
-    client.modify(localStorage.accessToken, data, success, error);
+    client.modify(window.localStorage.accessToken, data, success, error);
   },
 
   unarchiveItem: function(event) {
@@ -336,7 +336,7 @@ var PocketItemContent = React.createClass({
 
       self.updateStatus();
     };
-    client.modify(localStorage.accessToken, data, success, error);
+    client.modify(window.localStorage.accessToken, data, success, error);
   },
 
   setUserInputTags: function(event) {
@@ -392,7 +392,7 @@ var PocketItemContent = React.createClass({
       self.updateStatus();
     };
 
-    client.modify(localStorage.accessToken, data, success, error);
+    client.modify(window.localStorage.accessToken, data, success, error);
   },
 
   deleteTag: function(event) {
@@ -432,7 +432,7 @@ var PocketItemContent = React.createClass({
       self.updateStatus();
     };
 
-    client.modify(localStorage.accessToken, data, success, error);
+    client.modify(window.localStorage.accessToken, data, success, error);
   },
 
   render: function() {
@@ -551,7 +551,7 @@ var PocketItemContent = React.createClass({
 });
 
 var renderPopupContent = function() {
-  if (localStorage.accessToken) {
+  if (window.localStorage.accessToken) {
     chrome.tabs.query({
       active: true,
       lastFocusedWindow: true

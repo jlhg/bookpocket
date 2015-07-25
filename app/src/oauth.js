@@ -5,9 +5,9 @@ var PocketClient = require('./pocket_client.js');
 var client = new PocketClient(config.pocket);
 
 var checkAuthResult = function() {
-  if (localStorage.requestToken) {
-    client.getAccessToken(localStorage.requestToken, function(details) {
-      localStorage.setItem('accessToken', details.access_token);
+  if (window.localStorage.requestToken) {
+    client.getAccessToken(window.localStorage.requestToken, function(details) {
+      window.localStorage.setItem('accessToken', details.access_token);
     });
   } else {
       // TODO: error.
