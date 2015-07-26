@@ -506,7 +506,7 @@ var PocketItemContent = React.createClass({
           }
          })}
       </mui.List>
-      <mui.TextField hintText="Add tags"
+      <mui.TextField hintText="Add tags (Press Enter to update)"
                      ref="textAddTags"
                      value={this.state.userInputTags}
                      fullWidth={true}
