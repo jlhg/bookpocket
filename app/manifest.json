@@ -1,9 +1,9 @@
 {
   "manifest_version": 2,
-  "name": "LetPocket",
-  "short_name": "LetPocket",
-  "description": "Save the page to Pocket as a bookmark",
-  "version": "0.1",
+  "name": "BookPocket",
+  "short_name": "BookPocket",
+  "description": "Bookmark your web pages to Pocket",
+  "version": "1.0",
   "author": "Jian-Long Huang",
   "minimum_chrome_version": "38",
   "icons": {
@@ -20,7 +20,7 @@
       "19": "assets/images/icon_grey_19.png",
       "38": "assets/images/icon_grey_38.png"
     },
-    "default_title": "LetPocket",
+    "default_title": "BookPocket",
     "default_popup": "popup.html"
   },
   "permissions": [

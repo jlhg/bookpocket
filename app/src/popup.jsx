@@ -35,7 +35,7 @@ var AuthorizeContent = React.createClass({
       <div>
         <div style={{fontSize: "14px", display: "flex", justifyContent: "space-beteen"}}>
           <p>
-            Please click below to authorize LetPocket to access your Pocket account.
+            Please click below to authorize BookPocket to access your Pocket account.
             This is a one-time process.
           </p>
         </div>

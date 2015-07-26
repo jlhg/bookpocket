@@ -1,6 +1,6 @@
 {
-  "name": "letpocket",
-  "version": "0.1.0",
+  "name": "bookpocket",
+  "version": "1.0.0",
   "devDependencies": {
     "URIjs": "^1.15.2",
     "browserify": "^11.0.0",
