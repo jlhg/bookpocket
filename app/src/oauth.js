@@ -5,12 +5,17 @@ var PocketClient = require('./pocket_client.js');
 var client = new PocketClient(config.pocket);
 
 var checkAuthResult = function() {
-  if (window.localStorage.requestToken) {
-    client.getAccessToken(window.localStorage.requestToken, function(details) {
-      window.localStorage.setItem('accessToken', details.access_token);
-    });
+  if (window.localStorage.accessToken) {
+    document.write("You have authorized LetPocket to access Your Pocket account.");
   } else {
-      // TODO: error.
+    if (window.localStorage.requestToken) {
+      client.getAccessToken(window.localStorage.requestToken, function(details) {
+        window.localStorage.setItem('accessToken', details.access_token);
+        document.write("Authorized successfully!");
+      });
+    } else {
+      document.write("Authorized failed!");
+    }
   }
 };
 

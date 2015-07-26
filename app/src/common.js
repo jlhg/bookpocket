@@ -45,13 +45,14 @@ var itemCache = {
   set: function(item) {
     var data = {
       item_id: item.item_id,
+      resolved_title: item.resolved_title,
       favorite: item.favorite,
       status: item.status,
       tags: item.tags
     };
 
     try {
-      window.localStorage.setItem(item.given_url, JSON.stringify(data));
+      window.localStorage.setItem(item.resolved_url, JSON.stringify(data));
     } catch(e) {
       if (e.code == 22) {
         console.log('Local storage is full.');

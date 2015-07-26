@@ -1,11 +1,14 @@
 var React = require('react');
+var injectTapEventPlugin = require("react-tap-event-plugin");
 var URI = require('URIjs');
 var mui = require('material-ui');
+var MenuItem = require('material-ui/lib/menus/menu-item');
 var config = require('./config.js');
 var PocketClient = require('./pocket_client.js');
 var common = require('./common.js');
 var client = new PocketClient(config.pocket);
 var ThemeManager = new mui.Styles.ThemeManager();
+injectTapEventPlugin();
 
 var AuthorizeContent = React.createClass({
   childContextTypes: {
@@ -29,7 +32,17 @@ var AuthorizeContent = React.createClass({
 
   render: function() {
     return (
-      <mui.RaisedButton label="Authorize" onClick={this.startAuthFlow} />
+      <div>
+        <div style={{fontSize: "14px", display: "flex", justifyContent: "space-beteen"}}>
+          <p>
+            Please click below to authorize LetPocket to access your Pocket account.
+            This is a one-time process.
+          </p>
+        </div>
+        <div style={{display: "flex", justifyContent: "center"}}>
+          <mui.RaisedButton label="Authorize" onClick={this.startAuthFlow} />
+        </div>
+      </div>
     );
   }
 });
@@ -118,9 +131,11 @@ var PocketItemContent = React.createClass({
       isFavorited: false,
       isArchived: false,
       isDeleted: false,
+      title: '',
       tags: {},
     };
     state.itemId = item.item_id;
+    state.title = item.resolved_title;
 
     switch (item.status) {
       case '0':
@@ -435,6 +450,13 @@ var PocketItemContent = React.createClass({
     client.modify(window.localStorage.accessToken, data, success, error);
   },
 
+  deleteSession: function(event){
+    window.localStorage.clear();
+    common.displayOfflineIcon(this.props.tabId, function() {
+      window.close();
+    });
+  },
+
   render: function() {
     var self = this;
     var addItemButton;
@@ -443,10 +465,7 @@ var PocketItemContent = React.createClass({
     var btnLabelStyle = {
       fontSize: "10px"
     };
-    var btnStyle = {
-      marginLegt: "12px",
-      marginRight: "12px"
-    };
+    var btnStyle = {};
 
     if (this.state.isDeleted) {
       addItemButton = <mui.RaisedButton label="add"
@@ -490,8 +509,18 @@ var PocketItemContent = React.createClass({
                                              onClick={this.favoriteItem} />;
     }
 
+    var moreIcon = <mui.IconButton iconClassName="material-icons">more_horiz</mui.IconButton>;
+
     var content =
     <div>
+      <div style={{display: "flex", justifyContent: "space-between"}}>
+        <p style={{fontSize: "16px", fontWeight: "bold"}}>{this.state.title}</p>
+        <mui.IconMenu iconButtonElement={moreIcon}>
+          <MenuItem style={{fontSize: "10px", height: "30px", lineHeight: "30px"}}
+                    onClick={this.deleteSession}
+                    primaryText="Sign out" />
+        </mui.IconMenu>
+      </div>
       <mui.List subheader={this.props.tagsHeader}
                 subheaderStyle={{fontSize: "16px"}}>
         {Object.keys(this.state.tags).map(function(tag) {
@@ -506,13 +535,13 @@ var PocketItemContent = React.createClass({
           }
          })}
       </mui.List>
-      <mui.TextField hintText="Add tags"
+      <mui.TextField hintText="Add tags (Press Enter to update)"
                      ref="textAddTags"
                      value={this.state.userInputTags}
                      fullWidth={true}
                      onChange={this.setUserInputTags}
                      onEnterKeyDown={this.addTag} />
-      <div style={{marginTop: "10px"}}>
+      <div style={{marginTop: "10px", display: "flex", justifyContent: "space-between"}}>
         {archiveItemButton}
         {favoriteItemButton}
         {addItemButton}
