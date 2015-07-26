@@ -512,7 +512,7 @@ var PocketItemContent = React.createClass({
                      fullWidth={true}
                      onChange={this.setUserInputTags}
                      onEnterKeyDown={this.addTag} />
-      <div style={{marginTop: "10px"}}>
+      <div style={{marginTop: "10px", display: "flex", justifyContent: "space-between"}}>
         {archiveItemButton}
         {favoriteItemButton}
         {addItemButton}
