@@ -32,7 +32,17 @@ var AuthorizeContent = React.createClass({
 
   render: function() {
     return (
-      <mui.RaisedButton label="Authorize" onClick={this.startAuthFlow} />
+      <div>
+        <div style={{fontSize: "14px", display: "flex", justifyContent: "space-beteen"}}>
+          <p>
+            Please click below to authorize LetPocket to access your Pocket account.
+            This is a one-time process.
+          </p>
+        </div>
+        <div style={{display: "flex", justifyContent: "center"}}>
+          <mui.RaisedButton label="Authorize" onClick={this.startAuthFlow} />
+        </div>
+      </div>
     );
   }
 });
