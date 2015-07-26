@@ -12,9 +12,9 @@ BookPocket requires [npm](https://www.npmjs.com/) to install library dependencie
 
 ```
 $ cd bookpocket
-$ npm intall
+$ npm instsall
 $ gulp
-``` 
+```
 
 To build the production version which files are minified, just replace `gulp` with `gulp prod` in the last step.
 
