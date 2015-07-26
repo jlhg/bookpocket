@@ -6,7 +6,7 @@ var client = new PocketClient(config.pocket);
 
 var checkAuthResult = function() {
   if (window.localStorage.accessToken) {
-    document.write("You have authorized LetPocket to access Your Pocket account.");
+    document.write("You have authorized BookPocket to access Your Pocket account.");
   } else {
     if (window.localStorage.requestToken) {
       client.getAccessToken(window.localStorage.requestToken, function(details) {

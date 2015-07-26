@@ -42,7 +42,7 @@ var displayUnsavedIcon = function(tabId, callback) {
 };
 
 var itemCache = {
-  set: function(item) {
+  set: function(url, item) {
     var data = {
       item_id: item.item_id,
       resolved_title: item.resolved_title,
@@ -52,7 +52,7 @@ var itemCache = {
     };
 
     try {
-      window.localStorage.setItem(item.resolved_url, JSON.stringify(data));
+      window.localStorage.setItem(url, JSON.stringify(data));
     } catch(e) {
       if (e.code == 22) {
         console.log('Local storage is full.');

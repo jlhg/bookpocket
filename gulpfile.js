@@ -1,6 +1,7 @@
 var gulp = require('gulp');
 var browserify = require('browserify');
 var reactify = require('reactify');
+var uglify = require('gulp-uglify');
 var source = require('vinyl-source-stream');
 var dist = 'app/assets/javascripts';
 
@@ -28,6 +29,12 @@ gulp.task('oauth', function() {
     .pipe(gulp.dest(dist))
 });
 
+gulp.task('build_prod', ['build'], function() {
+  gulp.src('app/assets/javascripts/*.bundle.js')
+    .pipe(uglify())
+    .pipe(gulp.dest('app/assets/javascripts'));
+});
+
 gulp.task('build', ['background', 'popup', 'oauth']);
 
 gulp.task('watch', function() {
@@ -35,3 +42,4 @@ gulp.task('watch', function() {
 });
 
 gulp.task('default', ['watch', 'build']);
+gulp.task('prod', ['build_prod']);

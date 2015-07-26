@@ -35,7 +35,7 @@ var AuthorizeContent = React.createClass({
       <div>
         <div style={{fontSize: "14px", display: "flex", justifyContent: "space-beteen"}}>
           <p>
-            Please click below to authorize LetPocket to access your Pocket account.
+            Please click below to authorize BookPocket to access your Pocket account.
             This is a one-time process.
           </p>
         </div>
@@ -181,7 +181,7 @@ var PocketItemContent = React.createClass({
         common.displaySavedIcon(self.props.tabId, function() {
           self.setState(self.parseItemToState(item));
           self.setState({isRetrieved: true});
-          common.itemCache.set(item);
+          common.itemCache.set(self.props.url, item);
           if (success) {
             success();
           }

@@ -1,5 +1,7 @@
 *~
 \#*\#
+*.crx
+*.pem
 .tern-port
 .module-cache
 node_modules
