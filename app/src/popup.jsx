@@ -181,7 +181,7 @@ var PocketItemContent = React.createClass({
         common.displaySavedIcon(self.props.tabId, function() {
           self.setState(self.parseItemToState(item));
           self.setState({isRetrieved: true});
-          common.itemCache.set(item);
+          common.itemCache.set(self.props.url, item);
           if (success) {
             success();
           }

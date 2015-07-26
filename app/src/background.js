@@ -21,7 +21,7 @@ chrome.webNavigation.onCommitted.addListener(function(details) {
       var matchedItem = client.urlMatch(details.url, pocketItem);
       if (matchedItem) {
         common.displaySavedIcon(details.tabId);
-        common.itemCache.set(matchedItem);
+        common.itemCache.set(details.url, matchedItem);
       } else {
         common.displayUnsavedIcon(details.tabId);
       }
