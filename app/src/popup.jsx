@@ -443,10 +443,7 @@ var PocketItemContent = React.createClass({
     var btnLabelStyle = {
       fontSize: "10px"
     };
-    var btnStyle = {
-      marginLegt: "12px",
-      marginRight: "12px"
-    };
+    var btnStyle = {};
 
     if (this.state.isDeleted) {
       addItemButton = <mui.RaisedButton label="add"
