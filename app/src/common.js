@@ -45,6 +45,7 @@ var itemCache = {
   set: function(item) {
     var data = {
       item_id: item.item_id,
+      title: item.resolved_title,
       favorite: item.favorite,
       status: item.status,
       tags: item.tags

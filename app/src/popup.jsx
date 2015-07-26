@@ -121,9 +121,11 @@ var PocketItemContent = React.createClass({
       isFavorited: false,
       isArchived: false,
       isDeleted: false,
+      title: '',
       tags: {},
     };
     state.itemId = item.item_id;
+    state.title = item.resolved_title;
 
     switch (item.status) {
       case '0':
@@ -501,7 +503,8 @@ var PocketItemContent = React.createClass({
 
     var content =
     <div>
-      <div style={{display: "flex", justifyContent: "flex-end"}}>
+      <div style={{display: "flex", justifyContent: "space-between"}}>
+        <p style={{fontSize: "16px", fontWeight: "bold"}}>{this.state.title}</p>
         <mui.IconMenu iconButtonElement={moreIcon}>
           <MenuItem style={{fontSize: "10px", height: "30px", lineHeight: "30px"}}
                     onClick={this.deleteSession}
