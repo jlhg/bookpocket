@@ -1,11 +1,14 @@
 var React = require('react');
+var injectTapEventPlugin = require("react-tap-event-plugin");
 var URI = require('URIjs');
 var mui = require('material-ui');
+var MenuItem = require('material-ui/lib/menus/menu-item');
 var config = require('./config.js');
 var PocketClient = require('./pocket_client.js');
 var common = require('./common.js');
 var client = new PocketClient(config.pocket);
 var ThemeManager = new mui.Styles.ThemeManager();
+injectTapEventPlugin();
 
 var AuthorizeContent = React.createClass({
   childContextTypes: {
@@ -435,6 +438,13 @@ var PocketItemContent = React.createClass({
     client.modify(window.localStorage.accessToken, data, success, error);
   },
 
+  deleteSession: function(event){
+    window.localStorage.clear();
+    common.displayOfflineIcon(this.props.tabId, function() {
+      window.close();
+    });
+  },
+
   render: function() {
     var self = this;
     var addItemButton;
@@ -487,8 +497,17 @@ var PocketItemContent = React.createClass({
                                              onClick={this.favoriteItem} />;
     }
 
+    var moreIcon = <mui.IconButton iconClassName="material-icons">more_horiz</mui.IconButton>;
+
     var content =
     <div>
+      <div style={{display: "flex", justifyContent: "flex-end"}}>
+        <mui.IconMenu iconButtonElement={moreIcon}>
+          <MenuItem style={{fontSize: "10px", height: "30px", lineHeight: "30px"}}
+                    onClick={this.deleteSession}
+                    primaryText="Sign out" />
+        </mui.IconMenu>
+      </div>
       <mui.List subheader={this.props.tagsHeader}
                 subheaderStyle={{fontSize: "16px"}}>
         {Object.keys(this.state.tags).map(function(tag) {
