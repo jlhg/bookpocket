@@ -25,9 +25,6 @@ chrome.webNavigation.onCommitted.addListener(function(details) {
       } else {
         common.displayUnsavedIcon(details.tabId);
       }
-
-
-
     };
     var error = function() {
       common.displayOfflineIcon(details.tabId);
